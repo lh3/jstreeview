@@ -412,6 +412,16 @@ function kn_reorder(root)
  ***** Functions for plotting a tree *****
  *****************************************/
 
+function kn_canvas_hi_res(canvas, width, height)
+{
+    var ratio = window.devicePixelRatio;
+    canvas.width = width * ratio;
+    canvas.height = height * ratio;
+    canvas.style.width = width + "px";
+    canvas.style.height = height + "px";
+    canvas.getContext("2d").scale(ratio, ratio);
+}
+
 /* Calculate the coordinate of each node */
 function kn_calxy(tree, is_real)
 {
@@ -512,6 +522,7 @@ function kn_plot_core(canvas, tree, conf)
 		kn_plot_core_O(canvas, tree, conf);
 		return;
 	}
+	kn_canvas_hi_res(canvas, conf.width, conf.height);
 	var ctx = canvas.getContext("2d");
 	// ctx.font = "10px Sans Serif";
 	ctx.strokeStyle = ctx.fillStyle = "white";
@@ -623,6 +634,7 @@ function kn_plot_core(canvas, tree, conf)
 
 function kn_plot_core_O(canvas, tree, conf)
 {
+	kn_canvas_hi_res(canvas, conf.width, conf.height);
 	var ctx = canvas.getContext("2d");
 	ctx.strokeStyle = ctx.fillStyle = "white";
 	ctx.fillRect(0, 0, conf.width, conf.height);
@@ -986,7 +998,6 @@ kn_actions = new function() {
 		}
 	}
 }
-
 
 knhx_init = function(canvasId, textareaId) {
 
