@@ -1,8 +1,8 @@
 ## Getting Started
 ```sh
+# open https://lh3.sourceforge.io/jstree/ in your browser for a live example, or
 git clone https://github.com/lh3/jstreeview
 # then open index.html in a web browser
-# open https://lh3.sourceforge.io/jstree/ in your browser for a live example
 ```
 
 ## Introduction
