@@ -515,6 +515,16 @@ function kn_init_conf()
 	return conf;
 }
 
+function kn_drawText(ctx, conf, text, x, y)
+{
+	ctx.drawText(conf.font, conf.fontsize, x, y, text);
+}
+
+function kn_drawTextRight(ctx, conf, text, x, y)
+{
+	ctx.drawTextRight(conf.font, conf.fontsize, x, y, text);
+}
+
 /* Plot the tree in the "canvas". Both node.x and node.y MUST BE precomputed by kn_calxy */
 function kn_plot_core(canvas, tree, conf)
 {
@@ -532,7 +542,7 @@ function kn_plot_core(canvas, tree, conf)
 	var max_namelen, i;
 	for (i = 0, max_namelen = 0; i < tree.node.length; ++i) {
 		if (tree.node[i].child.length) continue;
-		var tmp = ctx.measureText(conf.font, conf.fontsize, tree.node[i].name);
+		var tmp = ctx.measureText2(conf.font, conf.fontsize, tree.node[i].name);
 		if (tmp > max_namelen) max_namelen = tmp;
 	}
 	// set transformation
@@ -558,13 +568,11 @@ function kn_plot_core(canvas, tree, conf)
 		var p = tree.node[i];
 		if (p.child.length == 0 || p.hidden) {
 			if (p.hl) {
-				var tmp = ctx.measureText(conf.font, conf.fontsize, tree.node[i].name);
+				var tmp = ctx.measureText2(conf.font, conf.fontsize, tree.node[i].name);
 				ctx.fillRect(p.x * real_x + conf.xskip * 2 + shift_x, p.y * real_y + shift_y - conf.fontsize * .8,
 							 tmp, conf.fontsize * 1.5);
 			}
-			// ctx.fillText(p.name, p.x * real_x + conf.xskip * 2 + shift_x, p.y * real_y + shift_y + conf.fontsize / 3);
-			ctx.drawText(conf.font, conf.fontsize, p.x * real_x + conf.xskip * 2 + shift_x,
-						 p.y * real_y + shift_y + conf.fontsize / 3, p.name);
+			kn_drawText(ctx, conf, p.name, p.x * real_x + conf.xskip * 2 + shift_x, p.y * real_y + shift_y + conf.fontsize / 3);
 		}
 	}
 	// internal name
@@ -572,9 +580,8 @@ function kn_plot_core(canvas, tree, conf)
 	for (i = 0; i < tree.node.length; ++i) {
 		var p = tree.node[i];
 		if (p.child.length && p.name.length > 0 && !p.hidden) {
-			var l = ctx.measureText(conf.font, conf.fontsize, p.name);
-			ctx.drawText(conf.font, conf.fontsize, p.x * real_x - conf.xskip + shift_x - l,
-						 p.y * real_y + shift_y - conf.fontsize / 3, p.name);
+			var l = ctx.measureText2(conf.font, conf.fontsize, p.name);
+			kn_drawText(ctx, conf, p.name, p.x * real_x - conf.xskip + shift_x - l, p.y * real_y + shift_y - conf.fontsize / 3);
 		}
 	}
 	// internal name 2
@@ -587,9 +594,8 @@ function kn_plot_core(canvas, tree, conf)
 				if (p.meta) {
 					var m = re.exec(p.meta);
 					if (m != null) {
-						var l = ctx.measureText(conf.font, conf.fontsize, m[1]);
-						ctx.drawText(conf.font, conf.fontsize, p.x * real_x - conf.xskip + shift_x - l,
-									 p.y * real_y + shift_y + conf.fontsize * 1.33, m[1]);
+						var l = ctx.measureText2(conf.font, conf.fontsize, m[1]);
+						kn_drawText(ctx, conf, m[1], p.x * real_x - conf.xskip + shift_x - l, p.y * real_y + shift_y + conf.fontsize * 1.33);
 					}
 				}
 			}
@@ -643,12 +649,13 @@ function kn_plot_core_O(canvas, tree, conf)
 	var max_namelen, i;
 	for (i = 0, max_namelen = max_namechr = 0; i < tree.node.length; ++i) {
 		if (tree.node[i].child.length) continue;
-		var tmp = ctx.measureText(conf.font, conf.fontsize, tree.node[i].name);
+		var tmp = ctx.measureText2(conf.font, conf.fontsize, tree.node[i].name);
 		if (tmp > max_namelen) max_namelen = tmp;
 	}
 	// set transformation and estimate the font size
 	var real_r, full = 2 * Math.PI * (350/360), fontsize;
 	fontsize = (conf.width/2 - conf.xmargin - 1 * tree.n_tips / full) / (max_namelen / conf.fontsize + tree.n_tips / full);
+	var conf_tmp = { font: conf.font, fontsize: fontsize };
 	if (fontsize > conf.fontsize) fontsize = conf.fontsize;
 	max_namelen *= fontsize / conf.fontsize;
 	conf.real_r = real_r = conf.width/2 - conf.xmargin - max_namelen;
@@ -681,15 +688,15 @@ function kn_plot_core_O(canvas, tree, conf)
 		if (p.child.length) continue;
 		ctx.save();
 		var tmp;
-		if (p.hl) tmp = ctx.measureText(conf.font, fontsize, tree.node[i].name);
+		if (p.hl) tmp = ctx.measureText2(conf.font, fontsize, tree.node[i].name);
 		if (p.y * full > Math.PI * .5 && p.y * full < Math.PI * 1.5) {
 			ctx.rotate(p.y * full - Math.PI);
 			if (p.hl) ctx.fillRect(-(real_r + fontsize/2), -fontsize * .8, -tmp, fontsize * 1.5);
-			ctx.drawTextRight(conf.font, fontsize, -(real_r + fontsize/2), fontsize/3, p.name);
+			kn_drawTextRight(ctx, conf_tmp, p.name, -(real_r + fontsize/2), fontsize/3);
 		} else {
 			ctx.rotate(p.y * full);
 			if (p.hl) ctx.fillRect(real_r + fontsize/2, -fontsize * .8, tmp, fontsize * 1.5);
-			ctx.drawText(conf.font, fontsize, real_r + fontsize/2, fontsize/3, p.name);
+			kn_drawText(ctx, conf_tmp, p.name, real_r + fontsize/2, fontsize/3);
 		}
 		ctx.restore();
 	}
