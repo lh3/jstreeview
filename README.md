@@ -34,8 +34,8 @@ In addition, jstreeview was using a third-party text drawing library as few web
 browsers supported text drawing in 2008. The update now supports built-in
 canvas fonts.
 
-Looking at my old code, I think some design choices at the time are
-questionable and may benefit a revamp. I will leave this to another day, or
+Looking at my 15-year-old code, I think some design choices at the time are
+questionable and may benefit from a revamp. I will leave this to another day, or
 the project may never see the light of day.
 
 [phylotree]: https://en.wikipedia.org/wiki/Phylogenetic_tree
